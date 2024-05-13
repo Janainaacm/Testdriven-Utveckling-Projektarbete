@@ -1,0 +1,156 @@
+Betygsgrundande projektuppgift
+
+För godkänt betyg
+
+Bekanta dig först med applikationen, som finns bifogad i zip-fil. Main-metoden som startar
+applikationen ligger i klassen ProjektUppgiftApplication. Spela några spel och gå igenom
+klasserna som används i applikationen. Ta reda på vilka klasser som behövs för att ett nytt spel
+kan kunna skapas.
+
+För att bli godkänd behöver du, förutom att utföra nedanstående tester, även checka in din kod till
+ett Github repository - och se till att din kod byggs via Maven vid incheckning. Detta görs med hjälp
+av Github Actions.
+
+
+Test med JUnit
+De klasser som ska testas är
+- IOHandler
+- PlayerInteraction (implementationsklass: SimplePlayerInteraction)
+- Actor ( implementationsklasser: Player, Goblin, Guard)
+- GameUtil
+- java.util.Scanner
+
+Allmän information om testerna och testklasserna, se nedan för lista över varje test som ska
+utföras
+
+Du ska skapa en testklass för varje klass som testas.
+Testklasserna ska ligga i samma paket som klassen som testas. Gäller dock inte det första
+testet, där lägger du testet under baspaketet (se.reky.hakan) eftersom det är en standard
+Java-klass som testas.
+
+Testklasser för klasserna IOHandler och PlayerInteraction ska innehålla privata metoder som
+tillhandahåller en instans av den klass som testas. Dessa metoder tar emot en sträng som
+argument. Den strängen används för att instansera den java.util.Scanner som behövs för att
+instansera klassen IOHandler. Detta för att undvika duplicering av kod i testen.
+
+I testklassen för IOHandler ska det alltså finnas en metod med denna signatur:
+private IOHandler <ditt_metod_namn> (String dataForScanner)
+
+I testklassen för PlayerInteraction ska följande metod finnas:
+private PlayerInteraction <ditt_metod_namn> (String dataForScanner)
+
+Dessa metoder anropas sedan från test-metoderna för att undvika att samma kod dupliceras i
+flera test.
+
+I testklassen för PlayerInteraction ska du ha en Player som klass-attribut. Så som:
+public <ditt_klass_namn> {
+private Player player;
+…
+}
+
+Denna Player ska instanseras i en metod som körs före varje test (använd rätt annotation i JUnit
+för detta ändamål). Använd den tomma konstruktorn i Player. I testmetoderna använder du
+denna instans av Player när det behövs.
+
+Sammanlagt är det 6 stycken test som ska utföras. Varje punkt i listan nedan motsvarar ett test
+/ en testmetod
+1) java.util.Scanner, som används i detta spel (precis som i era elevspel) kan instanseras
+med en sträng. Strängen kan motsvara det användaren matar in via System.in. Gör detta
+och testa sedan, med lämplig metod i Assertions-klassen, att metoden nextLine() i
+Scannern ger tillbaka denna data.
+2) Metoden hasNextInt() i en java.util.Scanner kommer att returnera true om du instanserar
+klassen med en siffra (fast i en sträng, omgiven av citattecken). För att kunna skapa en
+instans av klassen IOHandler behöver du skicka med en instans av java.util.Scanner.
+Skapa en instans av IOHandler med en Scanner, just instanserad med en siffra. Använd
+din privata metod du själv har skapat och som ger tillbaka en IOHandler-instans. Testa
+sedan metoden hasNextInt() i IOHandler på passande sätt. Undersök klassen IOHandler
+för att förstå hur detta hänger ihop.
+3) Du ska testa att metoden playerSetup(Player player) i interfacet PlayerInteraction
+(implementationsklassen är SimplePlayerInteraction) sätter spelarens namn. Använd den
+privata metoden som du själv har skapat och som ger dig en instans av PlayerInteraction
+och skicka med det tänkta namnet på spelaren till Scannern. Kalla därefter på metoden
+.playerSetup() och verifiera därefter, med lämplig metod i Assertions-klassen, att
+player.getName() motsvarar värdet av det namn du har valt (namnet du skickade in till
+Scannern).
+4) Testa att metoden updatePlayerHealth() i PlayerInteraction uppdaterar spelarens hälsa
+på korrekt sätt. Använd återigen den privata metoden för tillgång till instans av
+PlayerInteraction.
+5) Skapa ett test av attack()-metoden i Actor-klassen. Låt en implementation-klass av Actor
+attackera en annan implementations-klass av Actor. Verifiera att den attackerades HP
+minskar på ett sätt som överensstämmer med vad du förväntar dig. Instansera båda
+implementationerna med värden (ej de tomma konstruktorerna).
+6) Testa metoden toLowerCaseButFirstLetterCapitalized() i klassen GameUtil. Du ska testa
+att skicka in null till denna metod. Verifiera att ett GamingException kastas med
+passande metod i Assertions-biblioteket.
+
+
+
+Test med JUnit och Selenium
+
+Dessa test testar den webbdel som ingår i spelprojektet ni har fått från mig. Varje gång man har
+spelat ett spel sparas den instans av klassen Player som man spelar med i en databas. Den
+databasen finns bara in-memory, dvs data försvinner när man stänger ner applikationen.
+Webbdelen körs på localhost:8080. Det finns en endpoint på sökvägen /players och den visar
+upp en lista på spelare (Players) som har spelat, sorterad på hur många poäng man får i spelet.
+Poängen sparas i variabeln experience i Player-klassen.Endpointen nås via denna URL:
+
+http://localhost:8080/players
+
+Beskrivning av testklassen och dess struktur
+
+Skapa en testklass för klassen PlayerController. Eftersom dessa tester kommer att köras mot din
+lokala applikation på localhost:8080 kommer testerna inte att gå igenom på Github. Du behöver
+därför använda annotationen @Disabled på denna testklass. Den annoteringen gör att testerna i
+denna klass inte körs när applikationen byggs. Sätt alltså annotationen @Disabled på själva
+klassen.
+
+Koden som sätter upp en WebDriverManager ska du ha i metod som körs innan alla test. Använd
+passande annotation i JUnit 5.
+
+Din WebDriver måste vara klass-attribut i denna klass för att kunna instanseras och stängas ned i
+nedanstående metoder och användas i testmetoder.
+
+Koden som instanserar en WebDriver ska du ha i metod som körs före varje test. Speciell
+annotation från JUnit5 behövs även här.
+
+Kod som stänger ner WebDriver-instansen ska du ha i metod som körs efter varje test.
+Annotation behövs återigen.
+
+
+Att göra innan du utför testen
+
+Starta applikationen och spela minst två spel. Observera att varje gång du stänger ner
+applikationen kommer du att behöva spela om spelen med samma data, alternativt ändra i
+testen. I en real-world-applikation hade man använt en testdatabas som håller kvar data även när
+applikationen stängs ner, eller på annat sätt kontrollerat data.
+
+Lista över test som ska utföras med Selenium - en punkt i listan motsvarar ett test / en
+testmetod
+1) Verifiera att rätt antal players visas i listan (exempel: har du spelat två spel bör det finnas
+två players i listan och detta ska verifieras)
+2) Verifiera att namnet på den första playern i listan visas på sidan (använd metoden
+isDisplayed() i klassen WebElement).
+3) Testa att sidans titel överensstämmer med förväntat värde
+4) Testa att knappen har texten = Logga in
+
+
+För väl godkänt betyg (utöver kriterierna för godkänt betyg dessutom nedanstående)
+
+Du ska skapa en till endpoint i webbdelen. Denna endpoint ska kunna ta emot ett playerId, gå till
+databasen och hämta en player med motsvarande id genom att kalla på metoden findPlayerById
+i service-klassen. Du ska använda Thymeleaf som användargränssnitt på samma sätt som i den
+befintliga endpoinen. Detta innebär att du behöver skapa upp en ny HTML-sida med enkelt
+innehåll och som visar upp den player som hämtats från databasen.
+
+Dessutom behöver du modifiera Thymeleaf-sidan som används som gränssnitt för den befintliga
+endpointen /players och se till att varje player i listan genom en länk (HTML anchor tag) länkar till
+din nya endpoint. Playerns ID måste alltså skickas med i länken till endpointen på lämpligt sätt.
+
+Se till att data finns i databasen genom att spela några spel och utför detta test
+
+Gå till endpointen /players och hitta den första spelarens länk och klicka på den. På sidan som
+därpå visas (via din nya endpoint) ska du verifiera att data visas upp som det ska. Du kan
+exempelvis verifiera att spelarens namn visas upp.
+
+OBS: Använd klassen WebDriverWait för att säkerställa att data på den länkade andra sidan
+hinner läsas in efter klicket på länken på den första sidan.

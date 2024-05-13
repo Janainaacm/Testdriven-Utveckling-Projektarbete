@@ -5,7 +5,10 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PlayerControllerTest {
 
     ChromeDriver driver;
+    private final String url = "http://localhost:8080/players";
 
     @BeforeAll
     public static void init(){
@@ -35,7 +39,7 @@ public class PlayerControllerTest {
 
     @Test
     public void verifyCorrectAmountOfPlayersIsDisplayed() {
-        driver.get("http://localhost:8080/players");
+        driver.get(url);
 
         List<WebElement> players = driver.findElements(By.cssSelector("ul li"));
         assertEquals(3, players.size());
@@ -43,7 +47,7 @@ public class PlayerControllerTest {
 
     @Test
     public void verifyFirstNameInListIsCorrect() {
-        driver.get("http://localhost:8080/players");
+        driver.get(url);
 
         WebElement firstPlayerNameElement = driver.findElement(By.cssSelector("ul li:first-child .player-name"));
         assertTrue(firstPlayerNameElement.isDisplayed());
@@ -52,18 +56,35 @@ public class PlayerControllerTest {
 
     @Test
     public void verifyPageTitleAsExpected() {
-        driver.get("http://localhost:8080/players");
+        driver.get(url);
 
         assertEquals("Players List", driver.getTitle());
     }
 
     @Test
     public void verifyLoginButtonTextIsDisplayed() {
-        driver.get("http://localhost:8080/players");
+        driver.get(url);
 
-        WebElement loginButton = driver.findElement(By.tagName("button"));
-        assertTrue(loginButton.isDisplayed());
-        assertEquals("Logga in", loginButton.getText());
+        WebElement loginBtn = driver.findElement(By.tagName("button"));
+        assertTrue(loginBtn.isDisplayed());
+        assertEquals("Logga in", loginBtn.getText());
+    }
+
+    @Test
+    public void verifyPlayerDetailsPageDisplaysCorrectData() {
+        driver.get(url);
+
+        WebElement firstPlayerLink = driver.findElement(By.cssSelector("ul li:first-child a"));
+        String playerLinkText = firstPlayerLink.getText();
+
+        firstPlayerLink.click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.titleIs("Player Details"));
+
+        WebElement playerNameElement = driver.findElement(By.xpath("//p[contains(text(),'Name:')]"));
+        String playerNameText = playerNameElement.getText();
+        assertTrue(playerNameText.contains(playerLinkText), "Player name on the details page matches the link text");
     }
 
 
